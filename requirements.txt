@@ -1,0 +1,5 @@
+# requirements.txt
+discord.py[voice]>=2.0.0
+python-dotenv
+yt-dlp # Successor to youtube-dl, generally preferred
+PyNaCl # Already included by [voice], but good to be explicit
