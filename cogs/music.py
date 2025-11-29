@@ -3,6 +3,7 @@ import discord
 from discord.ext import commands
 import asyncio
 import logging
+import random
 from utils.ytdl import YTDLSource
 
 logger = logging.getLogger(__name__)
@@ -49,7 +50,6 @@ class Music(commands.Cog):
                 if vc.is_connected():
                     await vc.move_to(user_channel)
                 else:
-                    # Attempt reconnect
                     vc = await user_channel.connect(reconnect=True, timeout=30.0)
 
             self._ensure_guild_state_exists(guild_id)
@@ -199,7 +199,6 @@ class Music(commands.Cog):
             return
 
         async with ctx.typing():
-            # Use the utility class to get info
             song = await YTDLSource.get_song_info(query, self.bot.loop)
             if not song:
                 await ctx.send("❌ Could not find song.")
@@ -209,14 +208,10 @@ class Music(commands.Cog):
         guild_id = ctx.guild.id
         self._ensure_guild_state_exists(guild_id)
 
-        # 1. Always add the song to the queue first
         await self.queues[guild_id].put(song)
 
-        # 2. If nothing is playing, kick off the player
         if not (vc.is_playing() or vc.is_paused()):
             self._play_next(ctx)
-
-        # 3. If something IS playing, just notify the user it was added
         else:
             await ctx.send(
                 embed=discord.Embed(
@@ -225,6 +220,71 @@ class Music(commands.Cog):
                     color=discord.Color.green(),
                 )
             )
+
+    @commands.command(name="pause")
+    async def pause(self, ctx):
+        """
+        Pauses the current song.
+        No inputs required.
+        """
+        vc = ctx.guild.voice_client
+        if vc and vc.is_playing():
+            vc.pause()
+            await ctx.send("⏸️ **Paused**")
+        else:
+            await ctx.send("Nothing is playing or already paused.")
+
+    @commands.command(name="resume", aliases=["unpause"])
+    async def resume(self, ctx):
+        """
+        Resumes the paused song.
+        No inputs required.
+        """
+        vc = ctx.guild.voice_client
+        if vc and vc.is_paused():
+            vc.resume()
+            await ctx.send("▶️ **Resumed**")
+        else:
+            await ctx.send("The audio is not paused.")
+
+    # --- UPDATED VOLUME COMMAND ---
+    # hidden=True: Hides it from .help
+    # @commands.is_owner(): Only YOU can use it
+    @commands.command(name="volume", aliases=["vol"], hidden=True)
+    @commands.is_owner()
+    async def volume(self, ctx, volume: int):
+        """
+        Sets the volume (0-100).
+        Inputs: <0-100>
+        """
+        vc = ctx.guild.voice_client
+        if not vc or not vc.source:
+            return await ctx.send("❌ Nothing is playing.")
+
+        if 0 <= volume <= 100:
+            vc.source.volume = volume / 100
+            await ctx.send(f"🔊 Volume set to **{volume}%**")
+        else:
+            await ctx.send("❌ Please enter a number between 0 and 100.")
+
+    @commands.command(name="shuffle", aliases=["mix"])
+    async def shuffle(self, ctx):
+        """
+        Shuffles the current queue randomly.
+        No inputs required.
+        """
+        guild_id = ctx.guild.id
+        if guild_id not in self.queues or self.queues[guild_id].empty():
+            return await ctx.send("Queue is empty.")
+
+        queue_list = list(self.queues[guild_id]._queue)
+        random.shuffle(queue_list)
+
+        self.queues[guild_id] = asyncio.Queue()
+        for song in queue_list:
+            await self.queues[guild_id].put(song)
+
+        await ctx.send("🔀 **Queue shuffled!**")
 
     @commands.command(name="skip", aliases=["s"])
     async def skip(self, ctx):
