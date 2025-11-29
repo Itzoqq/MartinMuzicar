@@ -1,163 +1,172 @@
-Based on the CommonMark standards, here is the properly formatted raw Markdown source code.
+Here is a comprehensive, professionally formatted `README.md` file tailored specifically to the code you provided. It includes detailed instructions on setting up FFmpeg (which your code handles specifically) and a full command reference.
 
-**Instructions:**
+-----
 
-1.  Hover over the top-right corner of the black box below.
-2.  Click the **"Copy"** icon (📋).
-3.  Paste it directly into your `README.md` file in VS Code.
+# 🎵 MartinMuzicar Discord Bot
 
-<!-- end list -->
-
-````markdown
-# 🎵 MartinMuzicar - Discord Music Bot
-
-A feature-rich, open-source Discord Music Bot built with **Python (discord.py)** and **yt-dlp**. It supports playing high-quality audio from YouTube, queue management, volume control, and looping.
+**MartinMuzicar** is a feature-rich, open-source Discord music bot built with [discord.py](https://discordpy.readthedocs.io/en/stable/) and [yt-dlp](https://github.com/yt-dlp/yt-dlp). It allows you to play high-quality audio from YouTube directly in your voice channels with a robust queuing system.
 
 ## ✨ Features
 
-- **Music Playback:** Play songs via URL or search terms.
-- **Queue System:** Add multiple songs, shuffle, and view the queue.
-- **Playback Control:** Pause, Resume, Skip, Stop, and seek functionality.
-- **Looping:** Loop a single song or the entire queue.
-- **Volume Control:** Owner-only volume adjustment.
-- **Smart Help:** Interactive help menu (`.help`).
-- **Clean Code:** Modular design using Cogs.
+  * **Music Playback:** Stream music via YouTube links or direct search queries.
+  * **Queue Management:** Add songs, view the queue, remove specific tracks, or clear everything.
+  * **Looping:** Support for looping the entire queue or just the current song.
+  * **Playback Control:** Pause, resume, skip, and stop commands.
+  * **Shuffle:** Randomize your current music queue.
+  * **Volume Control:** (Bot Owner Only) Adjust playback volume dynamically.
+  * **Smart Error Handling:** Auto-reconnects to voice channels and handles playlist logic.
 
----
+-----
 
-## 🚀 Prerequisites
+## 🛠️ Prerequisites
 
-Before running the bot, ensure you have the following installed:
+Before you begin, ensure you have the following installed:
 
-1. **Python 3.8+**: [Download Python](https://www.python.org/downloads/)
-   * *Note during installation: Check "Add Python to PATH"*
-2. **FFmpeg**: Essential for audio processing. (See setup instructions below)
-3. **Git**: [Download Git](https://git-scm.com/downloads) (Optional, for cloning)
+1.  **Python 3.8+**: [Download Python](https://www.python.org/downloads/)
+2.  **Git**: [Download Git](https://git-scm.com/)
+3.  **FFmpeg**: Essential for audio processing (See setup guide below).
 
----
+-----
 
-## 🛠️ Installation Guide
+## 📥 Installation & Setup
 
-### 1. Clone the Repository
-Open your terminal (Command Prompt, PowerShell, or Terminal) and run:
+### 1\. Clone the Repository
+
+Open your terminal/command prompt and run:
+
 ```bash
-git clone [https://github.com/Itzoqq/MartinMuzicar.git](https://github.com/Itzoqq/MartinMuzicar.git)
+git clone https://github.com/yourusername/MartinMuzicar.git
 cd MartinMuzicar
-````
+```
 
-*Alternatively, download the code as a ZIP file and extract it.*
+### 2\. Set Up a Virtual Environment (Recommended)
 
-### 2\. Set Up Virtual Environment (Recommended)
+It is best practice to run Python projects in a virtual environment.
 
-This keeps your project dependencies isolated.
+```bash
+# Windows
+python -m venv venv
+venv\Scripts\activate
 
-  * **Windows:**
-    ```bash
-    python -m venv venv
-    venv\Scripts\activate
-    ```
-  * **Mac/Linux:**
-    ```bash
-    python3 -m venv venv
-    source venv/bin/activate
-    ```
+# Mac/Linux
+python3 -m venv venv
+source venv/bin/activate
+```
 
 ### 3\. Install Dependencies
 
-Install the required Python libraries using the provided `requirements.txt`:
+Install the required Python packages listed in `requirements.txt`:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4\. Configure Environment Variables
+### 4\. FFmpeg Setup (Crucial)
 
-1.  Create a file named `.env` in the root folder (same folder as `bot.py`).
-2.  Open it with a text editor (Notepad, VS Code).
-3.  Add your Discord Bot Token inside:
-    ```env
-    DISCORD_BOT_TOKEN=your_actual_bot_token_here
-    ```
-    *(Do not use quotes around the token)*
+This bot requires FFmpeg to process audio. You have two options:
 
------
+#### **Option A: Project-Level Installation (Recommended)**
 
-## 📼 FFmpeg Setup (Crucial\!)
+The bot is programmed to automatically look for a folder named `ffmpeg` inside the project directory.
 
-The bot needs **FFmpeg** to stream audio. You have two options:
-
-### Option A: System-Wide Installation (Recommended)
-
-1.  Download FFmpeg from [ffmpeg.org](https://ffmpeg.org/download.html).
+1.  Go to the [FFmpeg Downloads Page](https://ffmpeg.org/download.html).
+      * **Windows:** Go to [Gyan.dev](https://www.gyan.dev/ffmpeg/builds/) and download the "release-essentials" `.zip` file.
 2.  Extract the ZIP file.
-3.  Copy the `bin` folder path (e.g., `C:\ffmpeg\bin`).
-4.  Add this path to your **System Environment Variables** (Path).
-5.  Restart your terminal and type `ffmpeg -version` to verify.
+3.  Create a folder named `ffmpeg` in your project root.
+4.  Copy the contents of the extracted folder into your new `ffmpeg` folder.
+      * *Ensure the `bin` folder containing `ffmpeg.exe` is inside.*
+      * Structure should look like: `MartinMuzicar/ffmpeg/bin/ffmpeg.exe`
 
-### Option B: Local Project Folder
+#### **Option B: System Path**
 
-1.  Create a folder named `ffmpeg` inside the `MartinMuzicar` directory.
-2.  Place the `ffmpeg.exe` file directly into this folder (or inside `ffmpeg/bin/`).
-      * *Structure: `MartinMuzicar/ffmpeg/bin/ffmpeg.exe` OR `MartinMuzicar/ffmpeg/ffmpeg.exe`*
-3.  The bot is coded to automatically look for FFmpeg in these locations.
+If you already have FFmpeg installed globally on your computer (added to your System PATH variables), the bot will automatically detect it.
+
+### 5\. Environment Configuration
+
+1.  Create a file named `.env` in the root directory.
+2.  Add your Discord Bot Token inside the file:
+
+<!-- end list -->
+
+```env
+DISCORD_BOT_TOKEN=your_token_here
+```
+
+> **Note:** You can get your token from the [Discord Developer Portal](https://www.google.com/search?q=https://discord.com/developers/applications).
 
 -----
 
-## ▶️ Running the Bot
+## 🚀 Running the Bot
 
-Once everything is set up, start the bot:
+Once everything is set up, run the bot using:
 
 ```bash
 python bot.py
 ```
 
-*(Use `python3 bot.py` on Mac/Linux)*
-
-You should see logs indicating the bot has logged in and loaded the `Music` Cog.
+If successful, you will see logs in the console indicating the bot has logged in and cogs have loaded.
 
 -----
 
-## 🎮 Usage
+## 🎮 Command Reference
 
-**Prefix:** `.` (dot)
+The default prefix is **`.`** (dot).
 
-### 🎵 Music Commands
+### 🎶 Music Commands
 
-| Command | Alias | Description |
-| :--- | :--- | :--- |
-| `.play <query>` | `.p` | Plays a song from YouTube (Link or Search). |
-| `.skip` | `.s` | Skips the current song. |
-| `.stop` | | Stops playback and clears the queue. |
-| `.pause` | | Pauses the current song. |
-| `.resume` | `.unpause` | Resumes playback. |
-| `.queue` | `.q` | Displays the current queue. |
-| `.remove <id/name>`| `.rm` | Removes a specific song from the queue. |
-| `.shuffle` | `.mix` | Randomizes the current queue. |
-| `.loop` | | Toggles looping for the entire queue. |
-| `.loopsong` | | Toggles looping for the current song. |
+| Command | Alias | Arguments | Description |
+| :--- | :--- | :--- | :--- |
+| **`.play`** | `.p` | `<url>` or `<search>` | Plays a song from a URL or searches YouTube. |
+| **`.pause`** | | None | Pauses the current track. |
+| **`.resume`** | `.unpause` | None | Resumes a paused track. |
+| **`.skip`** | `.s` | None | Skips the current song. |
+| **`.stop`** | | None | Stops playback and clears the queue. |
+| **`.join`** | `.connect` | None | Summons the bot to your voice channel. |
+| **`.leave`** | `.dc` | None | Disconnects the bot from the voice channel. |
 
-### ⚙️ Utility Commands
+### 📂 Queue & Management
 
-| Command | Alias | Description |
-| :--- | :--- | :--- |
-| `.join` | `.connect` | Summons the bot to your voice channel. |
-| `.leave` | `.dc` | Disconnects the bot. |
-| `.help` | `.h` | Shows the help menu. |
-| `.volume <0-100>` | `.vol` | **(Owner Only)** Sets the playback volume. |
+| Command | Alias | Arguments | Description |
+| :--- | :--- | :--- | :--- |
+| **`.queue`** | `.q` | None | Displays the current list of songs. |
+| **`.remove`** | `.rm` | `<index>` or `<name>` | Removes a specific song from the queue. |
+| **`.shuffle`** | `.mix` | None | Randomizes the order of songs in the queue. |
+| **`.loop`** | | None | Toggles looping for the **entire queue**. |
+| **`.loopsong`**| | None | Toggles looping for the **current song**. |
+
+### ⚙️ Utility & Admin
+
+| Command | Alias | Arguments | Description |
+| :--- | :--- | :--- | :--- |
+| **`.help`** | `.h` | `[command]` | Shows the help menu or details for a command. |
+| **`.volume`** | `.vol` | `<0-100>` | **Owner Only:** Sets the playback volume. |
 
 -----
 
-## 📝 Troubleshooting
+## 📁 Project Structure
 
-  * **"FFmpeg was not found"**: Ensure you followed the FFmpeg setup step correctly. Try Option B if Option A fails.
-  * **"Privileged Intent" Error**: Go to the [Discord Developer Portal](https://www.google.com/search?q=https://discord.com/developers/applications) \> Your Bot \> **Bot** Tab \> Enable **"Message Content Intent"**.
-  * **"Opus Not Loaded"**: If on Linux, install `libopus` (`sudo apt install libopus0`). On Windows, `discord.py` usually handles this.
+```text
+MartinMuzicar/
+├── bot.py               # Main bot entry point
+├── requirements.txt     # Python dependencies
+├── .env                 # Token storage (Do not commit this!)
+├── .gitignore           # Files to ignore (logs, venv, etc.)
+├── cogs/                # Bot extensions (plugins)
+│   ├── help.py          # Custom help command
+│   └── music.py         # Main music logic
+├── utils/
+│   └── ytdl.py          # YouTube-DL and FFmpeg helper functions
+└── ffmpeg/              # (Optional) Local FFmpeg binaries
+```
+
+## 🤝 Troubleshooting
+
+  * **"FFmpeg not found":** Ensure you followed the FFmpeg setup step correctly. If you are using the local folder method, ensure `ffmpeg.exe` is located at `ffmpeg/bin/ffmpeg.exe` or `ffmpeg/ffmpeg.exe` relative to `bot.py`.
+  * **"Opus not loaded":** On some Linux systems, you may need to install `libopus` (e.g., `sudo apt install libopus0`). `discord.py[voice]` usually handles this, but keep it in mind.
+  * **"Download Error":** YouTube frequently changes their API. If music stops playing, try running `pip install --upgrade yt-dlp`.
 
 -----
 
 ## 📜 License
 
-This project is open-source. Feel free to modify and distribute.
-
-```
-```
+This project is open-source. Feel free to modify and distribute it as needed.
