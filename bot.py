@@ -30,7 +30,10 @@ intents.voice_states = True
 intents.guilds = True
 
 # --- Bot Initialization ---
-bot = commands.Bot(command_prefix=".", intents=intents, case_insensitive=True)
+# help_command=None disables the default help so we can use our custom one
+bot = commands.Bot(
+    command_prefix=".", intents=intents, case_insensitive=True, help_command=None
+)
 
 
 # --- Bot Events ---
