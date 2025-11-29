@@ -7,7 +7,6 @@ from discord.ext import commands
 from dotenv import load_dotenv
 
 # --- Basic Logging Setup ---
-# Configure logging to show timestamps and log levels
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s:%(levelname)s:%(name)s: %(message)s",
@@ -30,7 +29,6 @@ intents.voice_states = True
 intents.guilds = True
 
 # --- Bot Initialization ---
-# help_command=None disables the default help so we can use our custom one
 bot = commands.Bot(
     command_prefix=".", intents=intents, case_insensitive=True, help_command=None
 )
@@ -39,17 +37,12 @@ bot = commands.Bot(
 # --- Bot Events ---
 @bot.event
 async def on_ready():
-    """
-    Event handler triggers when the bot has successfully connected to the gateway.
-    Sets the bot's status and logs the connection details.
-    """
     logger.info(f"Logged in as {bot.user.name} (ID: {bot.user.id})")
     logger.info("Bot is ready and online.")
     logger.info("Loading cogs...")
 
     await load_cogs()
 
-    # Set status to ".play" to match the new prefix
     await bot.change_presence(
         activity=discord.Activity(
             type=discord.ActivityType.listening, name=".play | music"
@@ -60,11 +53,17 @@ async def on_ready():
 @bot.event
 async def on_command_error(ctx, error):
     """
-    Global error handler for commands.
-    Catches common errors and provides feedback to the user or logs the issue.
+    Global error handler.
     """
     if isinstance(error, commands.CommandNotFound):
-        # Ignore unknown commands to prevent log spam
+        # CHANGED: Invoke the help command if the command is unknown
+        logger.info(f"Unknown command used by {ctx.author}: {ctx.message.content}")
+        await ctx.send(f"❌ Unknown command: `{ctx.message.content}`")
+
+        # Trigger the help command manually
+        help_cmd = bot.get_command("help")
+        if help_cmd:
+            await ctx.invoke(help_cmd)
         return
 
     elif isinstance(error, commands.MissingRequiredArgument):
@@ -74,7 +73,6 @@ async def on_command_error(ctx, error):
         )
 
     elif isinstance(error, commands.CommandInvokeError):
-        # This handles errors that happen *inside* the command code
         logger.error(f"Error invoking command {ctx.command}: {error.original}")
         await ctx.send(
             "An error occurred while executing the command. Please check the logs."
@@ -92,10 +90,6 @@ async def on_command_error(ctx, error):
 
 # --- Cog Loading ---
 async def load_cogs():
-    """
-    Dynamically loads all extension files found in the './cogs' directory.
-    This allows for modular code management.
-    """
     if not os.path.exists("./cogs"):
         logger.warning("No 'cogs' directory found.")
         return
@@ -112,9 +106,6 @@ async def load_cogs():
 
 # --- Run the Bot ---
 async def main():
-    """
-    Main entry point. Starts the bot session.
-    """
     async with bot:
         await bot.start(BOT_TOKEN)
 

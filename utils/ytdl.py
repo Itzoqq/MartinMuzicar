@@ -5,6 +5,7 @@ import logging
 import pathlib
 import platform
 import discord
+from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +33,7 @@ YDL_OPTIONS = {
     "format": "bestaudio/best",
     "outtmpl": "%(extractor)s-%(id)s-%(title)s.%(ext)s",
     "restrictfilenames": True,
-    "noplaylist": True,
+    "noplaylist": True,  # This helps, but stripping the URL manually is safer
     "nocheckcertificate": True,
     "ignoreerrors": False,
     "logtostderr": False,
@@ -49,15 +50,53 @@ FFMPEG_OPTIONS = {
 
 
 class YTDLSource:
+    @staticmethod
+    def sanitize_url(url):
+        """
+        Cleans YouTube URLs to remove playlist parameters if a specific video is present.
+        Example:
+        Input:  https://www.youtube.com/watch?v=VIDEO_ID&list=PLAYLIST_ID
+        Output: https://www.youtube.com/watch?v=VIDEO_ID
+        """
+        try:
+            parsed = urlparse(url)
+            if "youtube.com" in parsed.netloc or "youtu.be" in parsed.netloc:
+                query = parse_qs(parsed.query)
+
+                # If it's a 'watch' URL and has a video ID ('v'), strip the list
+                if "v" in query:
+                    # Rebuild query with ONLY the video ID
+                    new_query = urlencode({"v": query["v"][0]})
+                    new_url = urlunparse(
+                        (
+                            parsed.scheme,
+                            parsed.netloc,
+                            parsed.path,
+                            parsed.params,
+                            new_query,
+                            parsed.fragment,
+                        )
+                    )
+                    logger.info(f"Sanitized URL: {new_url}")
+                    return new_url
+        except Exception as e:
+            logger.warning(f"URL sanitization failed: {e}")
+
+        # Return original if no changes needed or error
+        return url
+
     @classmethod
     async def get_song_info(cls, query, loop=None):
         """
-        Uses yt-dlp to fetch info. Static method to keep logic isolated.
+        Uses yt-dlp to fetch info.
         """
         loop = loop or asyncio.get_event_loop()
 
         try:
-            if not query.startswith("http"):
+            # 1. Clean the URL before processing
+            if query.startswith("http"):
+                query = cls.sanitize_url(query)
+            else:
                 query = f"ytsearch:{query}"
 
             logger.info(f"Processing query: {query}")

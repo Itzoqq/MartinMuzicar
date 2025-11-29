@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 import asyncio
 import logging
-from utils.ytdl import YTDLSource  # Importing our helper
+from utils.ytdl import YTDLSource
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +20,7 @@ class Music(commands.Cog):
         self.loop_queue = {}
         self.loop_song = {}
 
+    # --- Helper Methods ---
     def _initialize_guild_state(self, guild_id):
         self.queues[guild_id] = asyncio.Queue()
         self.current_song[guild_id] = None
@@ -168,18 +169,31 @@ class Music(commands.Cog):
             await self._cleanup(member.guild.id)
 
     # --- Commands ---
+
     @commands.command(name="join", aliases=["connect"])
     async def join(self, ctx):
+        """
+        Summons the bot to your voice channel.
+        No inputs required.
+        """
         if await self._ensure_voice_client(ctx):
             await ctx.send(f"👋 Joined **{ctx.guild.voice_client.channel.name}**!")
 
     @commands.command(name="leave", aliases=["dc"])
     async def leave(self, ctx):
+        """
+        Disconnects the bot and clears the queue.
+        No inputs required.
+        """
         await self._cleanup(ctx.guild.id)
         await ctx.send("👋 Disconnected.")
 
     @commands.command(name="play", aliases=["p"])
     async def play(self, ctx, *, query: str):
+        """
+        Plays a song from YouTube (Link or Search).
+        Inputs: <url> OR <search terms>
+        """
         vc = await self._ensure_voice_client(ctx)
         if not vc:
             return
@@ -214,6 +228,10 @@ class Music(commands.Cog):
 
     @commands.command(name="skip", aliases=["s"])
     async def skip(self, ctx):
+        """
+        Skips the current song immediately.
+        No inputs required.
+        """
         vc = ctx.guild.voice_client
         if vc and (vc.is_playing() or vc.is_paused()):
             self.loop_song[ctx.guild.id] = False
@@ -222,6 +240,10 @@ class Music(commands.Cog):
 
     @commands.command(name="remove", aliases=["rm"])
     async def remove(self, ctx, *, query: str):
+        """
+        Removes a song from the queue.
+        Inputs: <Queue Number> OR <Song Name>
+        """
         guild_id = ctx.guild.id
         if guild_id not in self.queues or self.queues[guild_id].empty():
             await ctx.send("Queue is empty.")
@@ -256,11 +278,19 @@ class Music(commands.Cog):
 
     @commands.command(name="queue", aliases=["q"])
     async def queue(self, ctx):
+        """
+        Displays the current music queue.
+        No inputs required.
+        """
         self._ensure_guild_state_exists(ctx.guild.id)
         await ctx.send(embed=self._create_queue_embed(ctx))
 
     @commands.command(name="stop")
     async def stop(self, ctx):
+        """
+        Stops playback and clears the queue completely.
+        No inputs required.
+        """
         if ctx.guild.voice_client:
             self.queues[ctx.guild.id] = asyncio.Queue()
             self.current_song[ctx.guild.id] = None
@@ -269,6 +299,10 @@ class Music(commands.Cog):
 
     @commands.command(name="loop")
     async def loop(self, ctx):
+        """
+        Toggles looping of the ENTIRE queue.
+        No inputs required.
+        """
         self._ensure_guild_state_exists(ctx.guild.id)
         self.loop_queue[ctx.guild.id] = not self.loop_queue[ctx.guild.id]
         if self.loop_queue[ctx.guild.id]:
@@ -279,6 +313,10 @@ class Music(commands.Cog):
 
     @commands.command(name="loopsong")
     async def loopsong(self, ctx):
+        """
+        Toggles looping of the CURRENT song.
+        No inputs required.
+        """
         self._ensure_guild_state_exists(ctx.guild.id)
         self.loop_song[ctx.guild.id] = not self.loop_song[ctx.guild.id]
         if self.loop_song[ctx.guild.id]:
