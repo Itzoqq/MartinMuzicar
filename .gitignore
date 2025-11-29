@@ -17,6 +17,9 @@ venv/
 ffmpeg/
 */ffmpeg/
 
+# Logs
+logs/*.log
+
 # VSCode specific
 .vscode/
 
