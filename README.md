@@ -1,5 +1,3 @@
-Here is a comprehensive, professionally formatted `README.md` file tailored specifically to the code you provided. It includes detailed instructions on setting up FFmpeg (which your code handles specifically) and a full command reference.
-
 -----
 
 # 🎵 MartinMuzicar Discord Bot
